@@ -1,5 +1,5 @@
 import { reactive } from "../reactive";
-import { effect } from "../effect";
+import { effect,stop } from "../effect";
 describe("effect",() =>{
     it("happy path",() =>{
         const user = reactive({
@@ -54,5 +54,25 @@ describe("effect",() =>{
         // // should have run
         expect(dummy).toBe(2);
     })
+    it("stop", () => {
+        let dummy;
+        const obj = reactive({ prop: 1 });
+        const runner = effect(() => {
+          dummy = obj.prop;
+        });
+        obj.prop = 2;
+        expect(dummy).toBe(2);
+        // 当调用stop的时候，应该把effect从deps中删除掉
+        stop(runner);
+        // 执行obj.prop = 3;
+        // 执行ob.prop++的时候会触犯收集依赖，调试了一个多小时
+        obj.prop = 3;
+        // obj.prop++;
+        expect(dummy).toBe(2);
+    
+        // stopped effect should still be manually callable
+        runner();
+        expect(dummy).toBe(3);
+    });
 })
 
