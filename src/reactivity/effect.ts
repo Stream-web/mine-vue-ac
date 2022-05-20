@@ -1,7 +1,10 @@
+import { extend } from "../shared/idnex";
+
 class ReactiveEffect {
     private _fn: any;
     deps = [];
     active = true;
+    onStop?:()=>void;
     public scheduler:Function | undefined;
     constructor(fn, scheduler?: Function) {
         this._fn = fn;
@@ -13,13 +16,17 @@ class ReactiveEffect {
         return this._fn();
     }
     stop() {
-    //     if(this.active){
-    //         cleanupEffect(this);
-    //         this.active = false;
-    // }
-    this.deps.forEach((dep:any)=>{
-        dep.delete(this)
-    })
+        if(this.active){
+            cleanupEffect(this);
+            if(this.onStop){
+                this.onStop();
+            }
+            this.active = false;
+    }
+    // this.deps.forEach((dep:any)=>{
+    //     dep.delete(this)
+    // })
+    // cleanupEffect(this);
 }
 }
 function cleanupEffect(effect){
@@ -45,8 +52,8 @@ export function track(target,key) {
     }
     // dep.add(activeEffect)
     // activeEffect.deps.push(dep)
-    // if (dep.has(activeEffect)) return;
-
+    // 可能是空的
+    if (!activeEffect) return;
     dep.add(activeEffect);
     activeEffect.deps.push(dep);
 }
@@ -68,7 +75,13 @@ export function effect(fn, options: any = {}) {
     // fn
     const _effect = new ReactiveEffect(fn, options.scheduler);
     // extend(_effect, options);
-  
+    // _effect.onStop = options.onStop;
+    // 更加优雅
+    Object.assign(_effect,options);
+
+    // extend
+    extend(_effect,options);
+
     _effect.run();
   
     const runner: any = _effect.run.bind(_effect);
