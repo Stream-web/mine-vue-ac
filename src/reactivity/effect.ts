@@ -1,5 +1,6 @@
 import { extend } from "../shared/idnex";
-
+let activeEffect;
+let shouldTrack;
 class ReactiveEffect {
     private _fn: any;
     deps = [];
@@ -12,8 +13,17 @@ class ReactiveEffect {
     }
     // 调用run的时候说明是一个正在执行的状态
     run(){
+        
+        // 1、会收集依赖
+        // shouldRrack 来区分
+        if(!this.active){
+            return this._fn();
+        }
+        shouldTrack = true;
         activeEffect = this;
-        return this._fn();
+        const result = this._fn()
+        shouldTrack = false;
+        return result;
     }
     stop() {
         if(this.active){
@@ -33,9 +43,13 @@ function cleanupEffect(effect){
     effect.deps.forEach((dep: any) => {
         dep.delete(effect);
     });
+    effect.deps.length = 0;
 }
 const targetMap = new Map()
 export function track(target,key) {
+    // if (!activeEffect) return;
+    // if(!shouldTrack) return;
+    if(!isTracking()) return;
     // set target -> key -> dep
     let depsMap = targetMap.get(target);
 
@@ -53,9 +67,13 @@ export function track(target,key) {
     // dep.add(activeEffect)
     // activeEffect.deps.push(dep)
     // 可能是空的
-    if (!activeEffect) return;
+// 已经在dep中
+    if(dep.has(activeEffect)) return;
     dep.add(activeEffect);
     activeEffect.deps.push(dep);
+}
+function isTracking(){
+    return shouldTrack && activeEffect !== undefined;
 }
 export function trigger(target,key) {
     let depsMap = targetMap.get(target);
@@ -70,7 +88,6 @@ export function trigger(target,key) {
         // effect.run()
     }
 }
-let activeEffect;
 export function effect(fn, options: any = {}) {
     // fn
     const _effect = new ReactiveEffect(fn, options.scheduler);

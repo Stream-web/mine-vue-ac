@@ -66,8 +66,9 @@ describe("effect",() =>{
         stop(runner);
         // 执行obj.prop = 3;
         // 执行ob.prop++的时候会触犯收集依赖，调试了一个多小时
-        obj.prop = 3;
-        // obj.prop++;
+        // obj.prop = 3;
+        obj.prop++;
+        // obj.prop++; obj.prop = obj.prop + 1;这里面涉及到重新收集依赖 不仅涉及到get还涉及到set 触发get ，重新收集依赖
         expect(dummy).toBe(2);
     
         // stopped effect should still be manually callable
