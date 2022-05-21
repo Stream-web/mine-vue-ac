@@ -68,17 +68,24 @@ export function track(target,key) {
     // activeEffect.deps.push(dep)
     // 可能是空的
 // 已经在dep中
+    trackEffects(dep);
+}
+
+export function trackEffects(dep){
     if(dep.has(activeEffect)) return;
     dep.add(activeEffect);
     activeEffect.deps.push(dep);
 }
-function isTracking(){
+export function isTracking(){
     return shouldTrack && activeEffect !== undefined;
 }
 export function trigger(target,key) {
     let depsMap = targetMap.get(target);
     let dep = depsMap.get(key);
 
+    triggerReffects(dep);
+}
+export function triggerReffects(dep){
     for(const effect of dep) {
         if(effect.scheduler){
             effect.scheduler()
@@ -86,7 +93,7 @@ export function trigger(target,key) {
             effect.run();
         }
         // effect.run()
-    }
+    } 
 }
 export function effect(fn, options: any = {}) {
     // fn
