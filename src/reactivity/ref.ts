@@ -54,3 +54,26 @@ export function unRef(ref){
 
     return isRef(ref) ? ref.value : ref;
 }
+export function proxyRefs(objectRefs){
+    return new Proxy(objectRefs,{
+        get(target,key) {
+            // get -> age (ref) 那么就能给他返回.value
+            return unRef(Reflect.get(target,key));
+        },
+        // set(target,key,value){
+        //     // set -> ref .value
+        //     if(isRef(target[key]) && !isRef(value)){
+        //         target[key].value = value;
+        //     } else {
+        //         return Reflect.set(target,key,value);
+        //     }
+        // }
+        set(target,key,value) {
+            if(isRef(target[key]) && !isRef(value)){
+                return target[key].value = value;
+            } else {
+                return Reflect.set(target,key,value);
+            }           
+        }
+    })
+}

@@ -1,6 +1,6 @@
 import { effect } from "../effect";
 import { reactive } from "../reactive";
-import { isRef, ref, unRef } from "../ref";
+import { isRef, proxyRefs, ref, unRef } from "../ref";
 describe("ref", () => {
   it("happy path", () => {
     const a = ref(1);
@@ -53,4 +53,32 @@ describe("ref", () => {
     expect(unRef(a)).toBe(1)
     expect(unRef(1)).toBe(1)
   })
+  it("proxyRefs", () => {
+    const user = {
+      age: ref(10),
+      name: "xiaohong",
+    };
+
+    // get -> age(ref) 那么就给他返回 .value ->
+    // not  ref 直接把值返回出去就行了
+
+    const proxyUser = proxyRefs(user);
+    expect(user.age.value).toBe(10);
+    expect(proxyUser.age).toBe(10);
+    expect(proxyUser.name).toBe("xiaohong");
+
+    proxyUser.age = 20;
+
+    // template 
+    // ref.value,可以不用通过ref.value然后取值，直接用ref
+    // vue3
+    // setup() { return { ref }}
+    // set -> ref，如果是一个ref类型
+    expect(proxyUser.age).toBe(20);
+    expect(user.age.value).toBe(20);
+
+    proxyUser.age = ref(10);
+    expect(proxyUser.age).toBe(10);
+    expect(user.age.value).toBe(10);
+  });
 });
