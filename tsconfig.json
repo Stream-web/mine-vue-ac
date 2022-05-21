@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    // 集成ts的时候出了点问题
     /* Visit https://aka.ms/tsconfig.json to read more about this file */
 
     /* Basic Options */
