@@ -30,7 +30,8 @@ function processComponent(vnode:any,container:any){
 }
 // mount
 function mountElement(vnode: any, container: any) {
-    const el = document.createElement(vnode.type);
+    // vnode -> element -> div
+    const el = (vnode.el =document.createElement(vnode.type));
     // el.text 
     // str{ing 或者array类型
     const { children } = vnode;
@@ -58,16 +59,20 @@ function mountChildren(vnode,container){
         patch(v,container);
     })
 }
-function mountComponent(vnode: any,container) {
-   const instance = createComponentInstance(vnode)
+//Vnode -> initialVNode，让代码更具有可读性
+function mountComponent(initialVNode: any,container) {
+   const instance = createComponentInstance(initialVNode)
     setupComponent(instance);
-    setupRenderEffect(instance,container);
+    setupRenderEffect(instance,initialVNode,container);
 }
-function setupRenderEffect(instance: any,container) {
+function setupRenderEffect(instance: any,initialVNode,container) {
+    const { proxy } = instance
     // throw new Error("Function not implemented.");
-    const subTree = instance.render();
+    const subTree = instance.render.call(proxy);
     // vnode -> patch
     // vnode -> element -> mountElement
     patch(subTree,container)
+    // element -> mount
+    initialVNode.el=subTree.el
 }
 
