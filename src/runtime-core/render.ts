@@ -1,6 +1,6 @@
 import { isObject } from './../shared/idnex';
 import { createComponentInstance, setupComponent } from "./component"
-
+import { ShapeFlags } from '../shared/ShapeFlags';
 export function render(vnode,container) {
     // patch
     patch(vnode,container);
@@ -8,9 +8,10 @@ export function render(vnode,container) {
 function patch(vnode,container){
 // 如果是component 那么它的type是一个object类型，如果是element类型，那么它是div
     // console.log('vnode.type',vnode.type);
-    if(typeof vnode.type === "string"){
+    const {shapeFlag} = vnode;
+    if(shapeFlag & ShapeFlags.ELEMENT){
         processElement(vnode,container);
-    } else if(isObject(vnode.type)){
+    } else if(shapeFlag & ShapeFlags.STATEFUL_COMPONENT){
         processComponent(vnode,container);
     }
     // 去处理组件
@@ -34,11 +35,11 @@ function mountElement(vnode: any, container: any) {
     const el = (vnode.el =document.createElement(vnode.type));
     // el.text 
     // str{ing 或者array类型
-    const { children } = vnode;
+    const { children,shapeFlag } = vnode;
 
-    if(typeof children === "string"){
+    if(shapeFlag & ShapeFlags.TEXT_CHILDREN){
         el.textContent = children;
-    } else if(Array.isArray(children)){
+    } else if(shapeFlag & ShapeFlags.ARRAY_CHILDREN){
         // vnode
         mountChildren(vnode,el);
     }
