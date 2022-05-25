@@ -13,6 +13,12 @@ export const App = {
         {
             id:"root",
             class:["red","hard"],
+            onClick(){
+                console.log("click")
+            },
+            onMousedown(){
+                console.log("onmousedown");
+            }
         },
         // this.$el -> get root element
         // [h("p",{class:"red"},"hi"),h("p",{class:"blue"},"mini-vue")]

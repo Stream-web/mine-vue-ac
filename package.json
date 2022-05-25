@@ -2,7 +2,7 @@
   "name": "mini-vueAc",
   "version": "1.0.0",
   "license": "MIT",
-  "main":"lib/guide-mini-cjs.js",
+  "main": "lib/guide-mini-cjs.js",
   "module": "lib/guide-mini-vue.esm.js",
   "scripts": {
     "test": "jest",
@@ -10,10 +10,12 @@
   },
   "dependencies": {
     "@rollup/plugin-typescript": "^8.3.2",
+    "@rollup/pluginutils": "^4.2.1",
     "@types/jest": "^27.5.1",
     "jest": "^28.1.0",
     "rollup": "^2.74.1",
-    "tslib": "^2.4.0"
+    "tslib": "^2.4.0",
+    "typescript": "^4.7.2"
   },
   "devDependencies": {
     "@babel/core": "^7.17.10",
