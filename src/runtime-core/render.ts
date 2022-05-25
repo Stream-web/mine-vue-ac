@@ -1,4 +1,4 @@
-import { isObject } from './../shared/idnex';
+import { isObject } from '../shared/index';
 import { createComponentInstance, setupComponent } from "./component"
 import { ShapeFlags } from '../shared/ShapeFlags';
 export function render(vnode,container) {

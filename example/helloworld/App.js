@@ -1,4 +1,5 @@
 import { h } from '../../lib/guide-mini-vue.esm.js'
+import { Foo } from './foo.js';
 
 window.self = null
 export const App = {
@@ -6,6 +7,7 @@ export const App = {
     // .vue
     // <template></template>
     // render
+    name:"App",
     render() {
         window.self = this;
         return h(
@@ -20,10 +22,11 @@ export const App = {
                 console.log("onmousedown");
             }
         },
+        [h("div",{},"hi," + this.msg),h(Foo,{count:1})]
         // this.$el -> get root element
         // [h("p",{class:"red"},"hi"),h("p",{class:"blue"},"mini-vue")]
         // setupState
-        "hi,"+this.msg
+        // "hi,"+this.msg
         );
     },
     setup(){

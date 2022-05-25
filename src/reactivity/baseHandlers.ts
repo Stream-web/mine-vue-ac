@@ -1,5 +1,5 @@
-import { extend } from './../shared/idnex';
-import { isObject } from "../shared/idnex";
+import { extend } from '../shared/index';
+import { isObject } from "../shared/index";
 import { track, trigger } from "./effect";
 import { reactive, ReactiveFlags, readonly, shallowReadonly } from "./reactive";
 const set = createSetter();
