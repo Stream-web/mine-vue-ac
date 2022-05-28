@@ -1,6 +1,7 @@
 import { isObject } from '../shared/index';
 import { createComponentInstance, setupComponent } from "./component"
 import { ShapeFlags } from '../shared/ShapeFlags';
+import { Fragment,Text } from './vnode';
 export function render(vnode,container) {
     // patch
     patch(vnode,container);
@@ -8,18 +9,40 @@ export function render(vnode,container) {
 function patch(vnode,container){
 // 如果是component 那么它的type是一个object类型，如果是element类型，那么它是div
     // console.log('vnode.type',vnode.type);
-    const {shapeFlag} = vnode;
-    if(shapeFlag & ShapeFlags.ELEMENT){
-        processElement(vnode,container);
-    } else if(shapeFlag & ShapeFlags.STATEFUL_COMPONENT){
-        processComponent(vnode,container);
+    const {type,shapeFlag} = vnode;
+    switch(type){
+        case Fragment:
+            processFragment(vnode,container);
+            break;
+        case Text:
+            processText(vnode,container);
+            break;
+        default:
+            if(shapeFlag & ShapeFlags.ELEMENT){
+                processElement(vnode,container);
+            } else if(shapeFlag & ShapeFlags.STATEFUL_COMPONENT){
+                processComponent(vnode,container);
+            }
+            break;
     }
+
     // 去处理组件
     // 判断是不是element类型
     // todo-如何区分element 和component类型
     // processElement();
     // processComponent(vnode,container)
 }
+function processText(vnode: any, container: any) {
+    // throw new Error('Function not implemented.');
+    const {children} = vnode
+    // children
+    const textNode = (vnode.el=document.createTextNode(children));
+    container.append(textNode);
+}
+function processFragment(vnode: any, container: any) {
+    mountChildren(vnode,container)
+}
+
 // 元素
 function processElement(vnode: any, container: any) {
     mountElement(vnode,container);
@@ -87,4 +110,7 @@ function setupRenderEffect(instance: any,initialVNode,container) {
     // element -> mount
     initialVNode.el=subTree.el
 }
+
+
+
 

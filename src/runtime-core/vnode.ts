@@ -1,5 +1,7 @@
 import { ShapeFlags } from "../shared/ShapeFlags";
 
+export const Fragment  = Symbol("Fragment");
+export const Text = Symbol("Text")
 export function createVNode(type,props?,children?){
     const vnode = {
         type,
@@ -19,10 +21,14 @@ export function createVNode(type,props?,children?){
 
     if(vnode.shapeFlag & ShapeFlags.STATEFUL_COMPONENT){
         if(typeof children === "object"){
-            vnode.shapeFlag = ShapeFlags.SLOT_CHILDREN
+            // 判断是一个对象 然后
+            vnode.shapeFlag |= ShapeFlags.SLOT_CHILDREN
         }
     }
     return vnode;
+}
+export function createTextVnode(text:string) {
+    return createVNode(Text,{},text);
 }
 function getShapeFlag(type) {
     return typeof type ==="string"

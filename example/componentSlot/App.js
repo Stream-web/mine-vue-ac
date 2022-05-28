@@ -1,4 +1,4 @@
-import { h } from "../../lib/guide-mini-vue.esm.js";
+import { h,createTextVnode } from "../../lib/guide-mini-vue.esm.js";
 import { Foo } from "./Foo.js";
 
 // Fragment 以及 Text
@@ -13,7 +13,14 @@ export const App = {
         {},
         // [h("p",{},"123")]
         {
-            header:({ age })=>h("p",{},"header"+age),
+            // element div 
+            // header:({ age })=>[h("p",{},"header"+age),
+            // createTextVnode("你好呀")
+            header: ({ age }) => [
+                h("p", {}, "header" + age),
+                createTextVnode("你好呀"),
+              ],
+        // ],
             footer:()=>h("p",{},"footer"),
         }
         );
