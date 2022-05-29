@@ -2,7 +2,26 @@ import { isObject } from '../shared/index';
 import { createComponentInstance, setupComponent } from "./component"
 import { ShapeFlags } from '../shared/ShapeFlags';
 import { Fragment,Text } from './vnode';
-export function render(vnode,container) {
+import { createAppAPI } from './createApp';
+
+export function createRenderer(options) {
+    // const {
+    //     createElement,
+    //     // hostCreateElement,
+    //     patchProp,
+    //     // :
+    //     // hostPatchProp,
+    //     insert
+    //     // :hostInsert
+    // } = options
+    const {
+        createElement: hostCreateElement,
+        patchProp: hostPatchProp,
+        insert: hostInsert,
+    } = options;
+    
+
+function render(vnode,container) {
     // patch
     patch(vnode,container,null);
 }
@@ -55,7 +74,9 @@ function processComponent(vnode:any,container:any,parentComponent){
 // mount
 function mountElement(vnode: any, container: any,parentComponent) {
     // vnode -> element -> div
-    const el = (vnode.el =document.createElement(vnode.type));
+    // canvans : new element
+    // 
+    const el = (vnode.el = hostCreateElement(vnode.type));
     // el.text 
     // str{ing 或者array类型
     const { children,shapeFlag } = vnode;
@@ -71,23 +92,14 @@ function mountElement(vnode: any, container: any,parentComponent) {
     // props 
     const { props } = vnode
     for(const key in props){
+
         const val = props[key];
-        // 具体的click -> 通用
-        // on + Evenet name
-        // onMousedown 
-        const isOn = (key:string) => /^on[A-Z]/.test(key)
-        if(isOn(key)){
-            const event = key.slice(2).toLowerCase();
-            el.addEventListener(event,val)
-        } else {
-            el.setAttribute(key,val);
-        }
-        // const val = props[key];
-        // el.setAttribute(key,val);
+        hostPatchProp(el,key,val)
     }
     // el.setAttribute("id","root");
-    container.append(el);
+    // container.append(el);
     // document.body.appendChild(el);
+    hostInsert(el,container)
 }
 function mountChildren(vnode,container,parentComponent){
     vnode.children.forEach((v)=>{
@@ -111,6 +123,8 @@ function setupRenderEffect(instance: any,initialVNode,container) {
     initialVNode.el=subTree.el
 }
 
-
-
+    return {
+        createApp: createAppAPI(render)
+    }
+}
 
