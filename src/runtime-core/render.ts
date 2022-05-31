@@ -3,6 +3,7 @@ import { createComponentInstance, setupComponent } from "./component"
 import { ShapeFlags } from '../shared/ShapeFlags';
 import { Fragment,Text } from './vnode';
 import { createAppAPI } from './createApp';
+import { effect } from '../reactivity/effect';
 
 export function createRenderer(options) {
     // const {
@@ -23,24 +24,26 @@ export function createRenderer(options) {
 
 function render(vnode,container) {
     // patch
-    patch(vnode,container,null);
+    patch(null,vnode,container,null);
 }
-function patch(vnode,container,parentComponent){
+// n1-> 老的
+// n2 -> 新的
+function patch(n1,n2,container,parentComponent){
 // 如果是component 那么它的type是一个object类型，如果是element类型，那么它是div
     // console.log('vnode.type',vnode.type);
-    const {type,shapeFlag} = vnode;
+    const {type,shapeFlag} = n2;
     switch(type){
         case Fragment:
-            processFragment(vnode,container,parentComponent);
+            processFragment(n1,n2,container,parentComponent);
             break;
         case Text:
-            processText(vnode,container);
+            processText(n1,n2,container);
             break;
         default:
             if(shapeFlag & ShapeFlags.ELEMENT){
-                processElement(vnode,container,parentComponent);
+                processElement(n1,n2,container,parentComponent);
             } else if(shapeFlag & ShapeFlags.STATEFUL_COMPONENT){
-                processComponent(vnode,container,parentComponent);
+                processComponent(n1,n2,container,parentComponent);
             }
             break;
     }
@@ -51,25 +54,33 @@ function patch(vnode,container,parentComponent){
     // processElement();
     // processComponent(vnode,container)
 }
-function processText(vnode: any, container: any) {
+function processText(n1,n2: any, container: any) {
     // throw new Error('Function not implemented.');
-    const {children} = vnode
+    const {children} = n2
     // children
-    const textNode = (vnode.el=document.createTextNode(children));
+    const textNode = (n2.el=document.createTextNode(children));
     container.append(textNode);
 }
-function processFragment(vnode: any, container: any,parentComponent) {
-    mountChildren(vnode,container,parentComponent)
+function processFragment(n1,n2, container: any,parentComponent) {
+    mountChildren(n2,container,parentComponent)
 }
 
 // 元素
-function processElement(vnode: any, container: any,parentComponent) {
-    mountElement(vnode,container,parentComponent);
+function processElement(n1,n2, container: any,parentComponent) {
+    if(!n1){
+        mountElement(n2,container,parentComponent);
+    } else {
+        patchElement(n1,n2,container)
+    }
+    
 }
-
+function patchElement(n1,n2,container){
+    console.log("n1","n1");
+    console.log("n2",n2);
+}
 // 组件
-function processComponent(vnode:any,container:any,parentComponent){
-    mountComponent(vnode,container,parentComponent)
+function processComponent(n1,n2:any,container:any,parentComponent){
+    mountComponent(n2,container,parentComponent)
 }
 // mount
 function mountElement(vnode: any, container: any,parentComponent) {
@@ -103,7 +114,7 @@ function mountElement(vnode: any, container: any,parentComponent) {
 }
 function mountChildren(vnode,container,parentComponent){
     vnode.children.forEach((v)=>{
-        patch(v,container,parentComponent);
+        patch(null,v,container,parentComponent);
     })
 }
 //Vnode -> initialVNode，让代码更具有可读性
@@ -113,14 +124,40 @@ function mountComponent(initialVNode: any,container,parentComponent) {
     setupRenderEffect(instance,initialVNode,container);
 }
 function setupRenderEffect(instance: any,initialVNode,container) {
-    const { proxy } = instance
-    // throw new Error("Function not implemented.");
-    const subTree = instance.render.call(proxy);
-    // vnode -> patch
-    // vnode -> element -> mountElement
-    patch(subTree,container,instance)
-    // element -> mount
-    initialVNode.el=subTree.el
+
+    effect(()=>{
+
+        if(!instance.isMounted){
+
+        console.log('初始化')
+        const { proxy } = instance
+        // throw new Error("Function not implemented.");
+        const subTree = (instance.subTree = instance.render.call(proxy));
+
+        console.log("subTree",subTree);
+
+        // vnode -> patch
+        // vnode -> element -> mountElement
+        patch(null,subTree,container,instance)
+        // element -> mount
+        initialVNode.el=subTree.el
+        instance.isMounted = true
+
+        } else {
+
+            console.log('更新')
+            const { proxy } = instance
+            // throw new Error("Function not implemented.");
+            const subTree = instance.render.call(proxy);
+            const prevSubTree = instance.subTree
+            instance.subTree = subTree
+            patch(prevSubTree,subTree,container,instance)
+
+
+            console.log("prevSubTree",prevSubTree)
+            console.log("cur",subTree);             
+        }
+    });
 }
 
     return {

@@ -1,12 +1,12 @@
 import { createRenderer } from "../runtime-core";
 
 function createElement (type) {
-    console.log("createEkement------------");
+    // console.log("createEkement------------");
     
     return document.createElement(type);
 }
 function patchProp(el,key,val) {
-    console.log("patchProp------------");
+    // console.log("patchProp------------");
         // const val = props[key];
         // 具体的click -> 通用
         // on + Evenet name
@@ -22,7 +22,7 @@ function patchProp(el,key,val) {
         el.setAttribute(key,val);
 }
 function insert(el,parent){
-    console.log("insert------------");
+    // console.log("insert------------");
     parent.append(el);
 }
 const renderer:any = createRenderer({
