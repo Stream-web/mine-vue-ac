@@ -5,6 +5,7 @@ import { Fragment,Text } from './vnode';
 import { createAppAPI } from './createApp';
 import { effect } from '../reactivity/effect';
 import { shouldUpdateComponent } from './componentUpdateUtils';
+import { queueJobs } from './scheduler';
 
 export function createRenderer(options) {
     // const {
@@ -383,10 +384,17 @@ function setupRenderEffect(instance: any,initialVNode,container,anchor) {
             patch(prevSubTree,subTree,container,instance,anchor)
 
 
-            console.log("prevSubTree",prevSubTree)
-            console.log("cur",subTree);             
+            // console.log("prevSubTree",prevSubTree)
+            // console.log("cur",subTree);             
         }
-    });
+    },
+    {
+        scheduler(){
+            console.log("update-cheduler");
+            queueJobs(instance.update)
+        }
+    }
+    );
 }
 
     return {
