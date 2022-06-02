@@ -5,7 +5,7 @@ function createElement (type) {
     
     return document.createElement(type);
 }
-function patchProp(el,key,val) {
+function patchProp(el,key,prevVal,nextVal) {
     // console.log("patchProp------------");
         // const val = props[key];
         // 具体的click -> 通用
@@ -14,21 +14,37 @@ function patchProp(el,key,val) {
         const isOn = (key:string) => /^on[A-Z]/.test(key)
         if(isOn(key)){
             const event = key.slice(2).toLowerCase();
-            el.addEventListener(event,val)
+            el.addEventListener(event,nextVal)
         } else {
-            el.setAttribute(key,val);
+            if(nextVal === undefined || nextVal === null){
+                el.removeAttribute(key);
+            } else {
+            el.setAttribute(key,nextVal);
         }
+    }
         
-        el.setAttribute(key,val);
+        el.setAttribute(key,nextVal);
 }
-function insert(el,parent){
+function insert(child,parent,anchor){
     // console.log("insert------------");
-    parent.append(el);
+    // parent.append(el);
+    parent.insertBefore(child,anchor || null);
+}
+function remove(child) {
+    const parent = child.parentNode;
+    if(parent) {
+        parent.removeChild(child);
+    }
+}
+function setElementText(el,text){
+    el.textContent = text
 }
 const renderer:any = createRenderer({
     createElement,
     patchProp,
-    insert
+    insert,
+    remove,
+    setElementText
 })
 export function createApp(...args) {
     return renderer.createApp(...args)
