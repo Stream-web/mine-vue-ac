@@ -4,6 +4,7 @@ import { ShapeFlags } from '../shared/ShapeFlags';
 import { Fragment,Text } from './vnode';
 import { createAppAPI } from './createApp';
 import { effect } from '../reactivity/effect';
+import { shouldUpdateComponent } from './componentUpdateUtils';
 
 export function createRenderer(options) {
     // const {
@@ -205,7 +206,7 @@ function patchKeydChildren(c1,c2,container,parentComponent,parentAnchor){
             if(prevChild.key!==null){
                 newIndex = keyTonewIndexMaP.get(prevChild.key)
             } else {
-                for(let j=s2;j<e2;j++){
+                for(let j=s2;j<=e2;j++){
                     if(isSomeVnodeType(prevChild,c2[j])){
                         newIndex = j; 
                         break;
@@ -283,7 +284,23 @@ function patchProp(el,oldProps,newProps) {
 }
 // 组件
 function processComponent(n1,n2:any,container:any,parentComponent,anchor){
-    mountComponent(n2,container,parentComponent,anchor)
+    if(!n1){
+        mountComponent(n2,container,parentComponent,anchor)
+    } else {
+        updateComponent(n1,n2);
+    }
+}
+function updateComponent(n1,n2){
+    const instance = (n2.component = n1.component);
+    if(shouldUpdateComponent(n1,n2)){
+      
+        instance.next = n2;
+        instance.update();
+    } else {
+        n2.el = n1.el;
+        instance.vnode = n2;
+    }
+
 }
 // mount
 function mountElement(vnode: any, container: any,parentComponent,anchor) {
@@ -322,13 +339,13 @@ function mountChildren(children,container,parentComponent,anchor){
 }
 //Vnode -> initialVNode，让代码更具有可读性
 function mountComponent(initialVNode: any,container,parentComponent,anchor) {
-   const instance = createComponentInstance(initialVNode,parentComponent)
+   const instance =(initialVNode.component=createComponentInstance(initialVNode,parentComponent)) 
     setupComponent(instance);
     setupRenderEffect(instance,initialVNode,container,anchor);
 }
 function setupRenderEffect(instance: any,initialVNode,container,anchor) {
 
-    effect(()=>{
+    instance.update = effect(()=>{
 
         if(!instance.isMounted){
 
@@ -348,6 +365,15 @@ function setupRenderEffect(instance: any,initialVNode,container,anchor) {
 
         } else {
 
+// 需要一个vnode
+            const {next,vnode} = instance
+
+            if(next){
+                next.el = vnode.el;
+                updateComponentPreRender(instance,next);
+            }
+
+
             console.log('更新')
             const { proxy } = instance
             // throw new Error("Function not implemented.");
@@ -366,6 +392,11 @@ function setupRenderEffect(instance: any,initialVNode,container,anchor) {
     return {
         createApp: createAppAPI(render)
     }
+}
+function updateComponentPreRender(instance,nextVNode){
+    instance.vnode = nextVNode;
+    instance.next = null;
+    instance.props = nextVNode.props;
 }
 function getSequence(arr) {
     const p = arr.slice();
