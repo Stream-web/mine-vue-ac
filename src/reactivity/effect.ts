@@ -68,7 +68,7 @@ export function track(target,key) {
     // activeEffect.deps.push(dep)
     // 可能是空的
 // 已经在dep中
-    trackEffects(dep);
+    trackEffects(dep); 
 }
 
 export function trackEffects(dep){
