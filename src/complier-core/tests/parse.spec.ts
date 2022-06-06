@@ -16,7 +16,7 @@ describe('Parse',() =>{
       });
 })
 describe('element',() =>{
-    describe("simple element div", () => {
+    it("simple element div", () => {
         test("simple interpolation", () => {
           const ast = baseParse("<div></div>");
     
@@ -27,3 +27,26 @@ describe('element',() =>{
         });
       });
 })
+// describe('text',() =>{
+//     it("simple text", () => {
+//         // test("simple text", () => {
+//           const ast = baseParse("some text");
+//     // 当不是插值的时候 也不是element的时候，默认处理的是text
+//           expect(ast.children[0]).toStrictEqual({
+//             type: NodeTypes.TEXT,
+//             tag:"some text",
+//           });
+//         // });
+//       });
+// })
+describe("text", () => {
+    it("simple text", () => {
+      const ast = baseParse("some text");
+
+      expect(ast.children[0]).toStrictEqual({
+        type: NodeTypes.TEXT,
+        content: "some text"
+      });
+    });
+});
+

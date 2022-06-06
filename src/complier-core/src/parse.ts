@@ -22,8 +22,28 @@ function parseChildren(context) {
             node = parseElement(context);
         }
     }
+
+    if(!node){
+        node = parseText(context)
+    }
+
     nodes.push(node);
     return nodes;
+}
+function parseText(context:any){
+    
+    const content = parseTextData(context,context.source.length);
+    return {
+        type:NodeTypes.TEXT,
+        content,
+    }
+}
+function parseTextData(context:any,length){
+    // 1.获取content
+    const content = context.source.slice(0,length)
+    // 2.推进
+    advanceBy(context,length)
+    return content;
 }
 function parseElement(context:any){
     const element  = parseTag(context,TagType.Start);
@@ -69,12 +89,14 @@ function parseInterpolation(context){
     const rawContentLength = closeIndex - openDelimiter.length;
 
 
-    const rawContent =  context.source.slice(0,rawContentLength);
+    // const rawContent =  context.source.slice(0,rawContentLength);
+        const rawContent = parseTextData(context,rawContentLength);
+
     const content = rawContent.trim()
 
     // content.source = context.source.slice(rawContentLength + closeDelimiter.length);
 
-    advanceBy(context,rawContentLength+closeDelimiter.length);
+    advanceBy(context,closeDelimiter.length);
 
 
     return {
