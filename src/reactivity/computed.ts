@@ -5,6 +5,8 @@ class ComputedImp{
     private _dirty: boolean = true;
     private _value: any;
     private _effect: any;
+    
+    // let a:any;
     constructor(getter){
         this._getter = getter
         this._effect = new ReactiveEffect(getter,() =>{

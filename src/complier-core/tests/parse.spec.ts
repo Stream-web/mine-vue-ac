@@ -17,28 +17,15 @@ describe('Parse',() =>{
 })
 describe('element',() =>{
     it("simple element div", () => {
-        test("simple interpolation", () => {
           const ast = baseParse("<div></div>");
     
           expect(ast.children[0]).toStrictEqual({
             type: NodeTypes.ELEMENT,
             tag:"div",
+            children:[],
           });
-        });
       });
 })
-// describe('text',() =>{
-//     it("simple text", () => {
-//         // test("simple text", () => {
-//           const ast = baseParse("some text");
-//     // 当不是插值的时候 也不是element的时候，默认处理的是text
-//           expect(ast.children[0]).toStrictEqual({
-//             type: NodeTypes.TEXT,
-//             tag:"some text",
-//           });
-//         // });
-//       });
-// })
 describe("text", () => {
     it("simple text", () => {
       const ast = baseParse("some text");
@@ -48,5 +35,61 @@ describe("text", () => {
         content: "some text"
       });
     });
+
+    test("hello world", () => {
+        const ast = baseParse("<div>hi,{{message}}</div>");
+    
+        expect(ast.children[0]).toStrictEqual({
+          type: NodeTypes.ELEMENT,
+          tag: "div",
+          children: [
+            {
+              type: NodeTypes.TEXT,
+              content: "hi,",
+            },
+            {
+              type: NodeTypes.INTERPOLATION,
+              content: {
+                type: NodeTypes.SIMPLE_EXPRESSION,
+                content: "message",
+              },
+            },
+          ],
+        });
+      });
+      test("Nested element ", () => {
+        const ast = baseParse("<div><p>hi</p>{{message}}</div>");
+    
+        expect(ast.children[0]).toStrictEqual({
+          type: NodeTypes.ELEMENT,
+          tag: "div",
+          children: [
+            {
+              type: NodeTypes.ELEMENT,
+              tag: "p",
+              children: [
+                {
+                  type: NodeTypes.TEXT,
+                  content: "hi",
+                },
+              ],
+            },
+            {
+              type: NodeTypes.INTERPOLATION,
+              content: {
+                type: NodeTypes.SIMPLE_EXPRESSION,
+                content: "message",
+              },
+            },
+          ],
+        });
+      });
+      test("should throw error when lack end tag", () => {
+        // baseParse("<div><span></div>");
+        expect(() => {
+          baseParse("<div><span></div>");
+        }).toThrow(`缺少结束标签:span`);
+      });
 });
+
 
