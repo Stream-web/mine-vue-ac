@@ -1,12 +1,18 @@
 
-export function transform(root,options){
+export function transform(root,options={}){
 
     const context = createTansformContext(root,options);
     // 1.遍历 深度优先搜索
     traverseNode(root,context);
     // 修改text content
+    createRootCodegen(root);
 
-}function createTansformContext(root: any, options: any) {
+}
+function createRootCodegen(root:any) {
+    // Implement
+    root.codegenNode = root.children[0];
+}
+function createTansformContext(root: any, options: any) {
     // throw new Error("Function not implemented.");
     const context = {
         root,
@@ -18,6 +24,7 @@ export function transform(root,options){
 function traverseNode(node: any,context) {
     // throw new Error("Function not implemented.");
    
+
 
 
     // if(node.type === NodeTypes.TEXT){
