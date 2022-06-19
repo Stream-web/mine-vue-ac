@@ -39,7 +39,7 @@ function isEnd(context,ancestors){
     //     return true;
     // }
     if(s.startsWith("</")){
-        for(let i=ancestors.length-1;i>=0;i++){
+        for(let i=ancestors.length-1;i>=0;i--){
             const tag = ancestors[i].tag;
             if(startsWithEndTagOpen(s,tag)){
                 return true;
@@ -160,6 +160,7 @@ function advanceBy(context:any,length:number){
 function createRoot(children){
     return {
         children,
+        type:NodeTypes.ROOT
     }
 }
 

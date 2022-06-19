@@ -1,3 +1,5 @@
+import { TO_DISPLAY_STRING } from './runtimeHelpers';
+import { NodeTypes } from "./ast";
 
 export function transform(root,options={}){
 
@@ -7,6 +9,7 @@ export function transform(root,options={}){
     // 修改text content
     createRootCodegen(root);
 
+    root.helpers = [...context.helpers.keys()]
 }
 function createRootCodegen(root:any) {
     // Implement
@@ -17,6 +20,10 @@ function createTansformContext(root: any, options: any) {
     const context = {
         root,
         nodeTransforms:options.nodeTransforms || [],
+        helpers:new Map(),
+        helper(key){
+            context.helpers.set(key,1);
+        }
     };
     return context
 }
@@ -38,7 +45,19 @@ function traverseNode(node: any,context) {
         transform(node);
     }
 
-    traverseChildren(node,context);
+    switch(node.type){
+        case NodeTypes.INTERPOLATION:
+            context.helper(TO_DISPLAY_STRING);
+            break;
+        case NodeTypes.ROOT:
+        case NodeTypes.ELEMENT:
+            traverseChildren(node,context);
+            break;
+        default:
+            break;
+    }
+
+    // traverseChildren(node,context);
 }
 function traverseChildren(node:any,context:any){
     const children = node.children;
