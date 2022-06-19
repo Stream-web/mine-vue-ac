@@ -1,6 +1,8 @@
 import { isString } from './../../shared/index';
 import { NodeTypes } from "./ast";
-import { CREATE_ELEMENT_VNODE, helperMapName, TO_DISPLAY_STRING } from "./runtimeHelpers";
+import { CREATE_ELEMENT_VNODE, 
+  helperMapName, 
+  TO_DISPLAY_STRING } from "./runtimeHelpers";
 
 export function generate(ast) {
     const context = createCodegenContext();
@@ -25,10 +27,10 @@ export function generate(ast) {
 function genFunctionPreamble(ast,context){
     const { push } = context;
     const VueBinging = "Vue";
-    const helpers = ["toDispalyString"];
+    // const helpers = ["toDispalyString"];
     const aliasHelper = (s) => `${helperMapName[s]}:_${helperMapName[s]}`;
     if(ast.helpers.length > 0){
-      push(`const { ${helpers.map(aliasHelper).join(", ")} } = ${VueBinging}`);
+      push(`const { ${ast.helpers.map(aliasHelper).join(", ")} } = ${VueBinging}`);
     }
     push("\n");
     push("return ");
@@ -40,7 +42,7 @@ function genFunctionPreamble(ast,context){
         context.code += source;
       },
       helper(key){
-        return `${helperMapName[key]}`;
+        return `_${helperMapName[key]}`;
       },
     };
 
@@ -48,22 +50,22 @@ function genFunctionPreamble(ast,context){
   }
   
   function genNode(node: any, context) {
-
-    switch(node.type){
+    switch (node.type) {
       case NodeTypes.TEXT:
-        genText(node,context)
+        genText(node, context);
         break;
       case NodeTypes.INTERPOLATION:
-          genInterpolation(node,context);
-          break
+        genInterpolation(node, context);
+        break;
       case NodeTypes.SIMPLE_EXPRESSION:
-        genExpression(node,context);
+        genExpression(node, context);
         break;
       case NodeTypes.ELEMENT:
-        genElement(node,context);
+        genElement(node, context);
         break;
       case NodeTypes.COMPOUND_EXPRESSION:
-        genCompoundExpression(node,context)
+        genCompoundExpression(node, context);
+        break;
       default:
         break;
     }
@@ -86,7 +88,8 @@ function genFunctionPreamble(ast,context){
     // push(`${helper(CREATE_ELEMENT_VNODE)}("div")`)
     const { tag,children,props } = node;
     // const child = children[0];
-    push(`${helper(CREATE_ELEMENT_VNODE)}("${tag}"),${props},`)
+    // push(`${helper(CREATE_ELEMENT_VNODE)}("${tag}"),${props},`)
+    push(`${helper(CREATE_ELEMENT_VNODE)}(`);
     // + _doDisplayString
     // (_ctx.message)`);
     // for(let i=0;i<children.length;i++){
@@ -129,13 +132,11 @@ function genFunctionPreamble(ast,context){
   }
   function genInterpolation(node:any,context:any){
     const { push,helper } = context;
-    push(`_${helper[TO_DISPLAY_STRING]}(`);
+    push(`${helper(TO_DISPLAY_STRING)}(`);
     // ${genNode(node,context)})
     genNode(node.content,context)
     push(")")
   }
-
-
 
 
 

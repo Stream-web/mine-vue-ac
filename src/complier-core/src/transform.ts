@@ -3,7 +3,7 @@ import { NodeTypes } from "./ast";
 
 export function transform(root,options={}){
 
-    const context = createTansformContext(root,options);
+    const context = createTransformContext(root,options);
     // 1.遍历 深度优先搜索
     traverseNode(root,context);
     // 修改text content
@@ -14,13 +14,13 @@ export function transform(root,options={}){
 function createRootCodegen(root:any) {
     // Implement
     const child = root.children[0];
-    if(child.type === root.children[0]){
+    if(child.type === NodeTypes.ELEMENT){
         root.codegenNode = child.codegenNode;
     } else {
         root.codegenNode = root.children[0];
     }
 }
-function createTansformContext(root: any, options: any) {
+function createTransformContext(root: any, options: any):any {
     // throw new Error("Function not implemented.");
     const context = {
         root,
@@ -70,12 +70,12 @@ function traverseNode(node: any,context) {
 }
 function traverseChildren(node:any,context:any){
     const children = node.children;
-    if(children){
+    // if(children){
         for(let i=0;i<children.length;i++){
             const node = children[i];
             traverseNode(node,context);
         }
-    }
+    // }
 }
 
 
