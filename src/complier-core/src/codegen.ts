@@ -1,5 +1,5 @@
 import { NodeTypes } from "./ast";
-import { helperMapName, TO_DISPLAY_STRING } from "./runtimeHelpers";
+import { CREATE_ELEMENT_VNODE, helperMapName, TO_DISPLAY_STRING } from "./runtimeHelpers";
 
 export function generate(ast) {
     const context = createCodegenContext();
@@ -54,12 +54,22 @@ function genFunctionPreamble(ast,context){
         break;
       case NodeTypes.INTERPOLATION:
           genInterpolation(node,context);
+          break
       case NodeTypes.SIMPLE_EXPRESSION:
         genExpression(node,context);
+        break;
+      case NodeTypes.ELEMENT:
+        genElement(node,context);
         break;
       default:
         break;
     }
+  }
+  function genElement(node:any,context:any){
+    const { push,helper } = context
+    // push(`${helper(CREATE_ELEMENT_VNODE)}("div")`)
+    const { tag } = node;
+    push(`${helper(CREATE_ELEMENT_VNODE)}(${tag})`);
   }
   function genExpression(node: any, context: any) {
     // throw new Error("Function not implemented.");
