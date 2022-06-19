@@ -13,7 +13,12 @@ export function transform(root,options={}){
 }
 function createRootCodegen(root:any) {
     // Implement
-    root.codegenNode = root.children[0];
+    const child = root.children[0];
+    if(child.type === root.children[0]){
+        root.codegenNode = child.codegenNode;
+    } else {
+        root.codegenNode = root.children[0];
+    }
 }
 function createTansformContext(root: any, options: any) {
     // throw new Error("Function not implemented.");
@@ -39,10 +44,11 @@ function traverseNode(node: any,context) {
     // }
     // 1.element
     const nodeTransforms = context.nodeTransforms;
-
+    const exitFns:any =[]
     for(let i=0;i<nodeTransforms.length;i++){
         const transform = nodeTransforms[i];
-        transform(node,context);
+        const onExit = transform(node,context);
+        if(onExit) exitFns.push(onExit);
     }
 
     switch(node.type){
@@ -56,7 +62,10 @@ function traverseNode(node: any,context) {
         default:
             break;
     }
-
+    let i = exitFns.length;
+    while(i--){
+        exitFns[i]();
+    }
     // traverseChildren(node,context);
 }
 function traverseChildren(node:any,context:any){

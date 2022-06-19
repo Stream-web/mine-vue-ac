@@ -2,12 +2,12 @@
 
 exports[`codegen element 1`] = `
 "const { undefined:_undefined } = Vue
-return function render(_ctx, _cache){return createElementVNode(div)}"
+return function render(_ctx, _cache){return createElementVNode(\\"div\\"),undefined,div, null, )}"
 `;
 
 exports[`codegen interpolation 1`] = `
 "const { undefined:_undefined } = Vue
-return function render(_ctx, _cache){return _undefined(_ctx.message)[object Object]}"
+return function render(_ctx, _cache){return _undefined(_ctx.message)}"
 `;
 
 exports[`codegen string 1`] = `

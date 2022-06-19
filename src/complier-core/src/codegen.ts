@@ -1,3 +1,4 @@
+import { isString } from './../../shared/index';
 import { NodeTypes } from "./ast";
 import { CREATE_ELEMENT_VNODE, helperMapName, TO_DISPLAY_STRING } from "./runtimeHelpers";
 
@@ -61,15 +62,61 @@ function genFunctionPreamble(ast,context){
       case NodeTypes.ELEMENT:
         genElement(node,context);
         break;
+      case NodeTypes.COMPOUND_EXPRESSION:
+        genCompoundExpression(node,context)
       default:
         break;
+    }
+  }
+  function genCompoundExpression(node: any, context: any) {
+    // throw new Error("Function not implemented.");
+    const { push } = context
+    const children = node.children
+    for(let i=0;i<children.length;i++){
+      const child = children[i]
+      if(isString(child)){
+        push(child);
+      } else {
+        genNode(child,context);
+      }
     }
   }
   function genElement(node:any,context:any){
     const { push,helper } = context
     // push(`${helper(CREATE_ELEMENT_VNODE)}("div")`)
-    const { tag } = node;
-    push(`${helper(CREATE_ELEMENT_VNODE)}(${tag})`);
+    const { tag,children,props } = node;
+    // const child = children[0];
+    push(`${helper(CREATE_ELEMENT_VNODE)}("${tag}"),${props},`)
+    // + _doDisplayString
+    // (_ctx.message)`);
+    // for(let i=0;i<children.length;i++){
+    //   const child = children[i];
+      
+    //   genNode(child,context);
+    // }
+    // genNode(children,context);
+    genNodeList(genNullable([tag,props,children]),context)
+    push(")");
+  }
+  function genNodeList(nodes,context) {
+    const { push } = context;
+    for (let index = 0; index < nodes.length; index++) {
+      // const element = array[index];
+      const node = nodes[index];
+      if(isString(node)){
+        push(node);
+      } else {
+        genNode(node,context)
+      }
+      if(index<nodes.length-1){
+        push(", ")
+      }
+    }
+    // throw new Error('Function not implemented.');
+  }
+  
+  function genNullable(args:any){
+    return args.map((arg) => arg || "null");
   }
   function genExpression(node: any, context: any) {
     // throw new Error("Function not implemented.");
@@ -87,5 +134,8 @@ function genFunctionPreamble(ast,context){
     genNode(node.content,context)
     push(")")
   }
+
+
+
 
 
