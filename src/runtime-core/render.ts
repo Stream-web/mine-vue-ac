@@ -353,7 +353,7 @@ function setupRenderEffect(instance: any,initialVNode,container,anchor) {
         console.log('初始化')
         const { proxy } = instance
         // throw new Error("Function not implemented.");
-        const subTree = (instance.subTree = instance.render.call(proxy));
+        const subTree = (instance.subTree = instance.render.call(proxy,proxy));
 
         console.log("subTree",subTree);
 
@@ -378,7 +378,7 @@ function setupRenderEffect(instance: any,initialVNode,container,anchor) {
             console.log('更新')
             const { proxy } = instance
             // throw new Error("Function not implemented.");
-            const subTree = instance.render.call(proxy);
+            const subTree = instance.render.call(proxy,proxy);
             const prevSubTree = instance.subTree
             instance.subTree = subTree
             patch(prevSubTree,subTree,container,instance,anchor)

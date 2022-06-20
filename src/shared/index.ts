@@ -1,4 +1,5 @@
 // 设置所有可以共享的模块
+export * from "./toDisplayString";
 export const extend = Object.assign;
 export const EMPTY_OBJ = {};
 export const isObject = (val) =>{
