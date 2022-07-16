@@ -7,8 +7,7 @@ export function initSlots(instance,children){
     if(vnode.shapeFlag & ShapeFlags.SLOT_CHILDREN) {
         normallizeObjectSlots(children,instance.slots);
     }
-
-    normallizeObjectSlots(children,instance.slots)
+    // normallizeObjectSlots(children,instance.slots)
 }
 function normallizeObjectSlots(children:any,slots:any){
     // const slots = {};

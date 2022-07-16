@@ -7,6 +7,7 @@ import { effect } from '../reactivity/effect';
 import { shouldUpdateComponent } from './componentUpdateUtils';
 import { queueJobs } from './scheduler';
 
+// 创建渲染器
 export function createRenderer(options) {
     // const {
     //     createElement,
@@ -19,8 +20,11 @@ export function createRenderer(options) {
     // } = options
     const {
         createElement: hostCreateElement,
+        // 属性
         patchProp: hostPatchProp,
+        // 插入元素
         insert: hostInsert,
+        // 移除元素
         remove:hostRemove,
         setElementText:hostSetElementText
     } = options;
@@ -37,6 +41,7 @@ function patch(n1,n2,container,parentComponent,anchor){
     // console.log('vnode.type',vnode.type);
     const {type,shapeFlag} = n2;
     switch(type){
+        // Fragment类型的话只渲染children里面的内容
         case Fragment:
             processFragment(n1,n2,container,parentComponent,anchor);
             break;
@@ -347,7 +352,7 @@ function mountComponent(initialVNode: any,container,parentComponent,anchor) {
 function setupRenderEffect(instance: any,initialVNode,container,anchor) {
 
     instance.update = effect(()=>{
-
+// 没有挂载
         if(!instance.isMounted){
 
         console.log('初始化')

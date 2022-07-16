@@ -26,7 +26,7 @@ export function createVNode(type,props?,children?){
 
     if(vnode.shapeFlag & ShapeFlags.STATEFUL_COMPONENT){
         if(typeof children === "object"){
-            // 判断是一个对象 然后
+            // 判断是一个对象 然后进行赋值
             vnode.shapeFlag |= ShapeFlags.SLOT_CHILDREN
         }
     }

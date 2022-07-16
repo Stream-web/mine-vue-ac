@@ -6,6 +6,8 @@ import { PublicInstanceProxyHandlers } from "./componentPublicInstance";
 import { initSlots } from "./componentslots";
 // import { initSlots } from "./componentSlots";
 
+
+// 创建组件实例
 export function createComponentInstance(vnode,parent){
     console.log("createComponentInstance",parent);
     const component = {
